@@ -2,7 +2,7 @@
 
 ## Description
 
-Web service which accept requests to run undeploy operation for specific stack from [google-stack](https://github.com/agilestacks/google-stacks) repo.
+Web service which accept requests to run undeploy operation for specific stack from [google-stack] repo.
 
 ## Development
 
@@ -55,3 +55,41 @@ docker build --tag "${IMAGE_NAME}:${IMAGE_TAG}" --tag "${IMAGE_NAME}:latest" . ;
 docker push "${IMAGE_NAME}:${IMAGE_TAG}";
 docker push "${IMAGE_NAME}:latest";
 ```
+
+### Deploy service
+
+Deploy with GCP Cloud Run
+
+```shell
+gcloud beta run deploy stack-disposer \
+  --region=us-central1 \
+  --image=gcr.io/superhub/stack-disposer:latest \
+  --port=8080 \
+  --allow-unauthenticated \
+  --cpu-throttling \
+  --execution-environment=gen2
+```
+
+## API
+
+This service expose next API endpoint
+
+```api
+DELETE /{sandboxId}/{stackId}
+```
+
+Where:
+
+- `sandboxId` is a type of sandbox from [google-stack]
+- `stackId` is a id of deployed stack
+
+Also this endpoint accept `verbose` parameters to run undeploy with verbosity output.
+> Note: service should be run with `-verbose` flag to see output of undeploy commands
+
+Example of request
+
+```shell
+curl -i -X "DELETE" "https://stack-disposer.run.app/gke-empty-cluster/stimulating-harris-239.epam.devops.delivery?verbose=1"
+```
+
+[google-stack]: https://github.com/agilestacks/google-stacks
