@@ -2,30 +2,41 @@ package api
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/agilestacks/stack-disposer/disposer/config"
+	"github.com/go-git/go-git/v5"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/gorilla/mux"
 )
 
 func UndeployStackHandler(w http.ResponseWriter, r *http.Request) {
 	query := r.URL.Query()
 	args := make([]string, 0)
-	verbose := len(query.Get("verbose")) > 0
+	verbose := false
+	verbose, _ = strconv.ParseBool(query.Get("verbose"))
 	if verbose {
 		args = append(args, "--verbose")
 	}
+	commit := query.Get("commit")
 
 	vars := mux.Vars(r)
 	sandboxId := vars["sandboxId"]
 	stackId := vars["stackId"]
 
-	stackDir := filepath.Join(config.GitDir, sandboxId)
+	log.Println("Undeploying", stackId)
+
+	dir := filepath.Join(config.GitDir, stackId)
+	checkout(dir, commit)
+
+	stackDir := filepath.Join(dir, sandboxId)
 
 	_, err := os.Stat(stackDir)
 	if os.IsNotExist(err) {
@@ -52,7 +63,6 @@ func UndeployStackHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func undeploy(stackDir string, stackId string, args ...string) error {
-	log.Println("Undeploying", stackId)
 
 	subCommands := make([]string, 0)
 	subCommands = append(subCommands, "stack", "init", stackId, "--force")
@@ -93,4 +103,54 @@ func hubCommand(dir string, args ...string) error {
 	}
 
 	return nil
+}
+
+func checkout(dir string, commit string) {
+	log.Println("Prepare sandboxes repository", dir, commit)
+
+	var progress io.Writer
+	if config.Verbose {
+		progress = log.Writer()
+	}
+
+	_, err := git.PlainClone(dir, false, &git.CloneOptions{
+		URL:      config.GitUrl,
+		Progress: progress,
+	})
+	// If exists - checkout HEAD with overwrite of local changes
+	if err != nil {
+		repo, err := git.PlainOpen(dir)
+		if err != nil {
+			log.Println("Unable to open git repo:", err)
+			return
+		}
+
+		refHash := plumbing.NewHash(commit)
+		if len(commit) <= 0 {
+
+			ref, err := repo.Head()
+			if err != nil {
+				log.Println("Unable to retrive ref to HEAD of git repo:", err)
+				return
+			}
+
+			refHash = ref.Hash()
+		}
+
+		wt, err := repo.Worktree()
+		if err != nil {
+			log.Println("Unable to read work tree of git repo:", err)
+			return
+		}
+
+		err = wt.Checkout(&git.CheckoutOptions{
+			Hash:  refHash,
+			Force: true,
+			Keep:  false,
+		})
+		if err != nil {
+			log.Println("Unable to checkout git repo:", err)
+			return
+		}
+	}
 }

@@ -3,13 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/go-git/go-git/v5"
 	"github.com/gorilla/mux"
 
 	"github.com/agilestacks/stack-disposer/disposer/api"
@@ -32,50 +30,6 @@ func init() {
 
 	if config.Verbose {
 		log.Print("VERBOSE logging enabled")
-	}
-}
-
-func init() {
-	log.Println("Prepare sandboxes repository", config.GitUrl)
-
-	var progress io.Writer
-	if config.Verbose {
-		progress = log.Writer()
-	}
-
-	_, err := git.PlainClone(config.GitDir, false, &git.CloneOptions{
-		URL:      config.GitUrl,
-		Progress: progress,
-	})
-	// If exists - checkout HEAD with overwrite of local changes
-	if err != nil {
-		repo, err := git.PlainOpen(config.GitDir)
-		if err != nil {
-			log.Println("Unable to open git repo:", err)
-			return
-		}
-
-		ref, err := repo.Head()
-		if err != nil {
-			log.Println("Unable to retrive ref to HEAD of git repo:", err)
-			return
-		}
-
-		wt, err := repo.Worktree()
-		if err != nil {
-			log.Println("Unable to read work tree of git repo:", err)
-			return
-		}
-
-		err = wt.Checkout(&git.CheckoutOptions{
-			Hash:  ref.Hash(),
-			Force: true,
-			Keep:  false,
-		})
-		if err != nil {
-			log.Println("Unable to checkout git repo:", err)
-			return
-		}
 	}
 }
 
