@@ -62,6 +62,7 @@ Deploy with GCP Cloud Run
 
 ```shell
 gcloud beta run deploy stack-disposer \
+  --format=json \
   --region=us-central1 \
   --image=gcr.io/superhub/stack-disposer:latest \
   --port=8080 \
