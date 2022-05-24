@@ -17,7 +17,7 @@
     "link": "eslint *.js",
     "link:fix": "eslint *.js --fix",
     "start": "functions-framework --runtime=nodejs16 --target=scan [--signature-type=http]",
-    "debug": "node --inspect node_modules/.bin/functions-framework --runtime=nodejs16 --target=scan [--signature-type=http]",
+    "debug": "node --inspect node_modules/.bin/functions-framework --runtime=nodejs16 --target=scan [--signature-type=http]"
   },
   "dependencies": {
     "@google-cloud/functions-framework": "^3.1.1",
