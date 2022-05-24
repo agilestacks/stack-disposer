@@ -1,0 +1,32 @@
+{
+  "name": "scanner",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "SuperHub Inc.",
+  "description": "GCP Cloud Function which scan stacks and send request to disposer service to undeploy them",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agilestacks/stack-disposer.git"
+  },
+  "main": "index.js",
+  "type": "module",
+  "engines": {
+    "node": ">= 16.0.0"
+  },
+  "scripts": {
+    "link": "eslint *.js",
+    "link:fix": "eslint *.js --fix",
+    "start": "functions-framework --runtime=nodejs16 --target=scan [--signature-type=http]",
+    "debug": "node --inspect node_modules/.bin/functions-framework --runtime=nodejs16 --target=scan [--signature-type=http]",
+  },
+  "dependencies": {
+    "@google-cloud/functions-framework": "^3.1.1",
+    "dayjs": "^1.11.2",
+    "node-fetch": "^3.2.4",
+    "qs": "^6.10.3"
+  },
+  "devDependencies": {
+    "eslint": "^8.16.0",
+    "eslint-config-google": "^0.14.0"
+  }
+}
