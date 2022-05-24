@@ -57,13 +57,14 @@ To deploy function to GCP you should have configured `gcloud` and have appropria
 
 ```shell
 gcloud functions deploy "stack-disposer-scanner" \
-    --format=json \
-    --runtime=nodejs16 \
+    --update-labels="version=$(git rev-parse --short HEAD)" \
+    --format="json" \
+    --runtime="nodejs16" \
     --trigger-http \
     --allow-unauthenticated \
     --source="." \
     --entry-point="scan" \
-    --set-env-vars='STATE_FUNCTION_URL=https://us-central1-superhub.cloudfunctions.net/stacks,DISPOSER_URL=https://stack-disposer-mvn4dxj74a-uc.a.run.app,DAYS_BEFORE=7,VERBOSE=false,TARGET_STATUSES=deployed;incomplete'
+    --set-env-vars="STATE_FUNCTION_URL=https://us-central1-superhub.cloudfunctions.net/stacks,DISPOSER_URL=https://stack-disposer-mvn4dxj74a-uc.a.run.app,DAYS_BEFORE=7,VERBOSE=false,TARGET_STATUSES=deployed;incomplete"
 ```
 
 Also, you need to create a Cloud Scheduler to invoke function be schedule.

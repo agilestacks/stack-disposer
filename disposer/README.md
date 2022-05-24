@@ -62,13 +62,14 @@ Deploy with GCP Cloud Run
 
 ```shell
 gcloud beta run deploy stack-disposer \
-  --format=json \
-  --region=us-central1 \
-  --image=gcr.io/superhub/stack-disposer:latest \
-  --port=8080 \
+  --update-labels="version=$(git rev-parse --short HEAD)" \
+  --format="json" \
+  --region="us-central1" \
+  --image="gcr.io/superhub/stack-disposer:latest" \
+  --port="8080" \
   --allow-unauthenticated \
   --cpu-throttling \
-  --execution-environment=gen2
+  --execution-environment="gen2"
 ```
 
 ## API
