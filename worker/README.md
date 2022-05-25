@@ -51,7 +51,7 @@ To build and push image
 ```shell
 IMAGE_NAME="gcr.io/superhub/stacks-disposer-worker";
 IMAGE_TAG="$(git rev-parse --short HEAD)";
-docker build --tag "${IMAGE_NAME}:${IMAGE_TAG}" --tag "${IMAGE_NAME}:latest" . ;
+docker buildx build --tag "${IMAGE_NAME}:${IMAGE_TAG}" --tag "${IMAGE_NAME}:latest" . ;
 docker push "${IMAGE_NAME}:${IMAGE_TAG}";
 docker push "${IMAGE_NAME}:latest";
 ```
