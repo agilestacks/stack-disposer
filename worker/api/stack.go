@@ -1,6 +1,7 @@
 package api
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -34,11 +35,15 @@ func UndeployStackHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("Undeploying", stackId)
 
 	dir := filepath.Join(config.GitDir, stackId)
-	checkout(dir, commit)
+	err := checkout(dir, commit)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
 
 	stackDir := filepath.Join(dir, sandboxId)
 
-	_, err := os.Stat(stackDir)
+	_, err = os.Stat(stackDir)
 	if os.IsNotExist(err) {
 		log.Printf("Sandbox type '%s' not found", sandboxId)
 		w.WriteHeader(http.StatusNotFound)
@@ -105,8 +110,12 @@ func hubCommand(dir string, args ...string) error {
 	return nil
 }
 
-func checkout(dir string, commit string) {
+func checkout(dir string, commit string) error {
 	log.Println("Prepare sandboxes repository", dir, commit)
+
+	if !plumbing.IsHash(commit) {
+		return errors.New(fmt.Sprint("invalid commit hash", commit))
+	}
 
 	var progress io.Writer
 	if config.Verbose {
@@ -122,7 +131,7 @@ func checkout(dir string, commit string) {
 		repo, err = git.PlainOpen(dir)
 		if err != nil {
 			log.Println("Unable to open git repo:", err)
-			return
+			return err
 		}
 	}
 
@@ -131,7 +140,7 @@ func checkout(dir string, commit string) {
 		ref, err := repo.Head()
 		if err != nil {
 			log.Println("Unable to retrive ref to HEAD of git repo:", err)
-			return
+			return err
 		}
 
 		refHash = ref.Hash()
@@ -140,7 +149,7 @@ func checkout(dir string, commit string) {
 	wt, err := repo.Worktree()
 	if err != nil {
 		log.Println("Unable to read work tree of git repo:", err)
-		return
+		return err
 	}
 
 	log.Println("Checkout", refHash)
@@ -151,6 +160,8 @@ func checkout(dir string, commit string) {
 	})
 	if err != nil {
 		log.Println("Unable to checkout git repo:", err)
-		return
+		return err
 	}
+
+	return nil
 }
