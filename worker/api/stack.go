@@ -113,44 +113,44 @@ func checkout(dir string, commit string) {
 		progress = log.Writer()
 	}
 
-	_, err := git.PlainClone(dir, false, &git.CloneOptions{
+	repo, err := git.PlainClone(dir, false, &git.CloneOptions{
 		URL:      config.GitUrl,
 		Progress: progress,
 	})
-	// If exists - checkout HEAD with overwrite of local changes
+
 	if err != nil {
-		repo, err := git.PlainOpen(dir)
+		repo, err = git.PlainOpen(dir)
 		if err != nil {
 			log.Println("Unable to open git repo:", err)
 			return
 		}
+	}
 
-		refHash := plumbing.NewHash(commit)
-		if len(commit) <= 0 {
-
-			ref, err := repo.Head()
-			if err != nil {
-				log.Println("Unable to retrive ref to HEAD of git repo:", err)
-				return
-			}
-
-			refHash = ref.Hash()
-		}
-
-		wt, err := repo.Worktree()
+	refHash := plumbing.NewHash(commit)
+	if len(commit) <= 0 {
+		ref, err := repo.Head()
 		if err != nil {
-			log.Println("Unable to read work tree of git repo:", err)
+			log.Println("Unable to retrive ref to HEAD of git repo:", err)
 			return
 		}
 
-		err = wt.Checkout(&git.CheckoutOptions{
-			Hash:  refHash,
-			Force: true,
-			Keep:  false,
-		})
-		if err != nil {
-			log.Println("Unable to checkout git repo:", err)
-			return
-		}
+		refHash = ref.Hash()
+	}
+
+	wt, err := repo.Worktree()
+	if err != nil {
+		log.Println("Unable to read work tree of git repo:", err)
+		return
+	}
+
+	log.Println("Checkout", refHash)
+	err = wt.Checkout(&git.CheckoutOptions{
+		Hash:  refHash,
+		Force: true,
+		Keep:  false,
+	})
+	if err != nil {
+		log.Println("Unable to checkout git repo:", err)
+		return
 	}
 }
