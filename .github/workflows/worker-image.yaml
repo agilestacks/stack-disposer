@@ -5,10 +5,10 @@ on:
     branches:
       - "main"
     paths:
-      - ./worker/**.go
-      - ./worker/Dockerfile
-      - ./worker/go.mod
-      - ./worker/go.sum
+      - worker/**.go
+      - worker/Dockerfile
+      - worker/go.mod
+      - worker/go.sum
   workflow_dispatch: {}
 
 jobs:
