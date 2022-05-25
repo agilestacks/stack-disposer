@@ -86,8 +86,11 @@ Where:
 - `sandboxId` is a type of sandbox from [google-stack]
 - `stackId` is a id of deployed stack
 
-Also this endpoint accept `verbose` parameters to run undeploy with verbosity output.
-> Note: service should be run with `-verbose` flag to see output of undeploy commands
+Also this endpoint accept next parameters:
+
+- `verbose` - to run undeploy with verbosity output.
+  > Note: service should be run with `-verbose` flag to see output of undeploy commands
+- `commit` - to run undeploy agains target commit of [google-stack] repo.
 
 Example of request
 
