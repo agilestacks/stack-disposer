@@ -56,7 +56,7 @@ And after that attach debugger to it. Example of launch config for VS Code
 To deploy function to GCP you should have configured `gcloud` and have appropriate permissions to work with Cloud Function
 
 ```shell
-gcloud functions deploy "stack-disposer-scanner" \
+gcloud functions deploy "stacks-disposer-scanner" \
     --update-labels="version=$(git rev-parse --short HEAD)" \
     --format="json" \
     --runtime="nodejs16" \
@@ -64,7 +64,7 @@ gcloud functions deploy "stack-disposer-scanner" \
     --allow-unauthenticated \
     --source="." \
     --entry-point="scan" \
-    --set-env-vars="STATE_FUNCTION_URL=https://us-central1-superhub.cloudfunctions.net/stacks,DISPOSER_URL=https://stack-disposer-mvn4dxj74a-uc.a.run.app,DAYS_BEFORE=7,VERBOSE=false,TARGET_STATUSES=deployed;incomplete"
+    --set-env-vars="STATE_FUNCTION_URL=https://us-central1-superhub.cloudfunctions.net/stacks,DISPOSER_URL=https://stacks-disposer-worker-mvn4dxj74a-uc.a.run.app,DAYS_BEFORE=7,VERBOSE=false,TARGET_STATUSES=deployed;incomplete"
 ```
 
 Also, you need to create a Cloud Scheduler to invoke function be schedule.
@@ -74,6 +74,6 @@ gcloud scheduler jobs create http "stacks-disposer-job" \
     --format="json" \
     --location="us-central1" \
     --schedule="0 0 * * *" \
-    --uri="https://us-central1-superhub.cloudfunctions.net/stack-disposer-scanner" \
+    --uri="https://us-central1-superhub.cloudfunctions.net/stacks-disposer-scanner" \
     --http-method="GET"
 ```
