@@ -1,8 +1,8 @@
 {
   "name": "scanner",
   "private": true,
-  "license": "Apache-2.0",
-  "author": "SuperHub Inc.",
+  "license": "MPL 2.0",
+  "author": "EPAM Systems, Inc.",
   "description": "GCP Cloud Function which scan stacks and send request to disposer service to undeploy them",
   "repository": {
     "type": "git",
@@ -14,8 +14,8 @@
     "node": ">= 16.0.0"
   },
   "scripts": {
-    "link": "eslint *.js",
-    "link:fix": "eslint *.js --fix",
+    "lint": "eslint *.js",
+    "lint:fix": "eslint *.js --fix",
     "start": "functions-framework --runtime=nodejs16 --target=scan [--signature-type=http]",
     "debug": "node --inspect node_modules/.bin/functions-framework --runtime=nodejs16 --target=scan [--signature-type=http]"
   },
